@@ -1,9 +1,11 @@
-require('dotenv').config();
-const express = require('express');
-const mongoose = require('mongoose');
-const cors = require('cors');
-const dashboardRoutes = require('./routes/dashboard');
-const authRoutes = require('./routes/auth');
+import express from 'express';
+import mongoose from 'mongoose';
+import cors from 'cors';
+import dotenv from 'dotenv';
+import dashboardRoutes from './routes/dashboard';
+import authRoutes from './routes/auth';
+
+dotenv.config();
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -18,7 +20,7 @@ app.use('/api/auth', authRoutes);
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/shadcn-dashboard')
     .then(() => console.log('Connected to MongoDB'))
-    .catch(err => console.error('Could not connect to MongoDB:', err));
+    .catch(err => console.error('MongoDB connection error:', err));
 
 app.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);

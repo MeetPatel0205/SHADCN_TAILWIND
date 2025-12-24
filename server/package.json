@@ -2,11 +2,12 @@
     "name": "shadcn-dashboard-server",
     "version": "1.0.0",
     "description": "Backend API for ShadCN Dashboard",
-    "main": "index.js",
+    "main": "index.ts",
     "scripts": {
-        "start": "node index.js",
-        "dev": "nodemon index.js",
-        "seed": "node seed.js"
+        "start": "ts-node index.ts",
+        "dev": "nodemon --exec ts-node index.ts",
+        "seed": "ts-node seed.ts",
+        "test": "echo \"Error: no test specified\" && exit 1"
     },
     "dependencies": {
         "bcryptjs": "^3.0.3",
@@ -14,9 +15,17 @@
         "dotenv": "^16.4.5",
         "express": "^4.19.2",
         "jsonwebtoken": "^9.0.3",
-        "mongoose": "^8.3.4"
+        "mongoose": "^8.3.4",
+        "saslprep": "^1.0.3"
     },
     "devDependencies": {
-        "nodemon": "^3.1.0"
+        "@types/bcryptjs": "^2.4.6",
+        "@types/cors": "^2.8.19",
+        "@types/express": "^5.0.6",
+        "@types/jsonwebtoken": "^9.0.10",
+        "@types/node": "^25.0.3",
+        "nodemon": "^3.1.0",
+        "ts-node": "^10.9.2",
+        "typescript": "^5.9.3"
     }
 }

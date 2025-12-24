@@ -1,13 +1,18 @@
-const express = require('express');
-const router = express.Router();
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+import express, { Request, Response, NextFunction } from 'express';
+import bcrypt from 'bcryptjs';
+import jwt from 'jsonwebtoken';
+import User, { IUser } from '../models/User';
 
+const router = express.Router();
 const JWT_SECRET = process.env.JWT_SECRET || 'supersecretkeychangeinproduction';
 
+// Extend Request interface to include user
+interface AuthRequest extends Request {
+    user?: any;
+}
+
 // Middleware to verify token
-const verifyToken = (req, res, next) => {
+const verifyToken = (req: AuthRequest, res: Response, next: NextFunction) => {
     const token = req.header('Authorization')?.replace('Bearer ', '');
     if (!token) return res.status(401).json({ message: 'Access denied' });
 
@@ -21,7 +26,7 @@ const verifyToken = (req, res, next) => {
 };
 
 // REGISTER
-router.post('/signup', async (req, res) => {
+router.post('/signup', async (req: Request, res: Response) => {
     const { name, email, password } = req.body;
 
     try {
@@ -51,13 +56,13 @@ router.post('/signup', async (req, res) => {
                 avatar: savedUser.avatar
             }
         });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ message: err.message });
     }
 });
 
 // LOGIN
-router.post('/login', async (req, res) => {
+router.post('/login', async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     try {
@@ -77,20 +82,20 @@ router.post('/login', async (req, res) => {
                 avatar: user.avatar
             }
         });
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ message: err.message });
     }
 });
 
 // GET CURRENT USER
-router.get('/me', verifyToken, async (req, res) => {
+router.get('/me', verifyToken, async (req: AuthRequest, res: Response) => {
     try {
         const user = await User.findById(req.user._id).select('-password'); // Exclude password
         if (!user) return res.status(404).json({ message: 'User not found' });
         res.json(user);
-    } catch (err) {
+    } catch (err: any) {
         res.status(500).json({ message: err.message });
     }
 });
 
-module.exports = router;
+export default router;
