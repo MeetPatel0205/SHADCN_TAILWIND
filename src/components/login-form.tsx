@@ -11,15 +11,59 @@ import {
 import { Input } from "@/components/ui/input"
 import { Link } from "react-router-dom"
 
+import { useState } from "react"
+import { useNavigate } from "react-router-dom"
+import { useAuth } from "@/context/auth-context"
+import { toast } from "sonner"
+
 export function LoginForm({
   className,
   ...props
 }: React.ComponentProps<"div">) {
+  const [isLoading, setIsLoading] = useState(false)
+  const { login } = useAuth()
+  const navigate = useNavigate()
+
+  async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    setIsLoading(true)
+
+    const formData = new FormData(event.currentTarget)
+    const email = formData.get("email") as string
+    const password = formData.get("password") as string
+
+    try {
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
+      })
+
+      const data = await response.json()
+
+      if (!response.ok) {
+        throw new Error(data.message || "Something went wrong")
+      }
+
+      login(data.token, data.user)
+      toast.success("Logged in successfully")
+      navigate("/")
+    } catch (error) {
+      if (error instanceof Error) {
+        toast.error(error.message)
+      } else {
+        toast.error("An error occurred. Please try again.")
+      }
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
   return (
     <div className={cn("flex flex-col gap-6", className)} {...props}>
       <Card className="overflow-hidden p-0">
         <CardContent className="grid p-0 md:grid-cols-2">
-          <form className="p-6 md:p-8">
+          <form className="p-6 md:p-8" onSubmit={onSubmit}>
             <FieldGroup>
               <div className="flex flex-col items-center gap-2 text-center">
                 <h1 className="text-2xl font-bold">Welcome back</h1>
@@ -31,6 +75,7 @@ export function LoginForm({
                 <FieldLabel htmlFor="email">Email</FieldLabel>
                 <Input
                   id="email"
+                  name="email"
                   type="email"
                   placeholder="m@example.com"
                   required
@@ -46,10 +91,12 @@ export function LoginForm({
                     Forgot your password?
                   </a>
                 </div>
-                <Input id="password" type="password" required />
+                <Input id="password" name="password" type="password" required />
               </Field>
               <Field>
-                <Button type="submit">Login</Button>
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? "Logging in..." : "Login"}
+                </Button>
               </Field>
               <FieldSeparator className="*:data-[slot=field-separator-content]:bg-card">
                 Or continue with
@@ -84,7 +131,7 @@ export function LoginForm({
                 </Button>
               </Field>
               <FieldDescription className="text-center">
-                Don&apos;t have an account? <Link to ="/signup">Sign up</Link>
+                Don&apos;t have an account? <Link to="/signup">Sign up</Link>
               </FieldDescription>
             </FieldGroup>
           </form>

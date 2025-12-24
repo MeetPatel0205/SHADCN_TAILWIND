@@ -2,7 +2,6 @@
 
 import {
   IconCreditCard,
-  IconDotsVertical,
   IconLogout,
   IconNotification,
   IconUserCircle,
@@ -28,6 +27,9 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from "@/components/ui/sidebar"
+import { IconDotsVertical } from "@tabler/icons-react"
+
+import { useAuth } from "@/context/auth-context"
 
 export function NavUser({
   user,
@@ -39,6 +41,7 @@ export function NavUser({
   }
 }) {
   const { isMobile } = useSidebar()
+  const { logout } = useAuth()
 
   return (
     <SidebarMenu>
@@ -98,7 +101,7 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem onClick={logout}>
               <IconLogout />
               Log out
             </DropdownMenuItem>
