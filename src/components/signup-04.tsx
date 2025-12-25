@@ -54,7 +54,7 @@ export function Signup04({ className, ...props }: React.ComponentPropsWithoutRef
         }
 
         try {
-            const response = await fetch("/api/auth/signup", {
+            const response = await fetch("/api/auth/customer/signup", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({

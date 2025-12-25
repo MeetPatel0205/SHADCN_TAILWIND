@@ -16,8 +16,9 @@ import { toast } from "sonner"
 
 export function LoginForm({
   className,
+  isCustomer = false,
   ...props
-}: React.ComponentProps<"div">) {
+}: React.ComponentProps<"div"> & { isCustomer?: boolean }) {
   const navigate = useNavigate()
   const { login } = useAuth()
   const [isLoading, setIsLoading] = useState(false)
@@ -31,7 +32,8 @@ export function LoginForm({
     const password = formData.get("password") as string
 
     try {
-      const response = await fetch("/api/auth/login", {
+      const endpoint = isCustomer ? "/api/auth/customer/login" : "/api/auth/login"
+      const response = await fetch(endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ email, password }),
@@ -45,7 +47,7 @@ export function LoginForm({
 
       login(data.token, data.user)
       toast.success("Welcome back!")
-      navigate("/")
+      navigate(isCustomer ? "/customer/dashboard" : "/")
     } catch (error) {
       if (error instanceof Error) {
         toast.error(error.message)

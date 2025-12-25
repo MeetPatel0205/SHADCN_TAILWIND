@@ -5,16 +5,7 @@ export interface IUser extends Document {
     email: string;
     password: string;
     avatar: string;
-    role: 'admin' | 'customer';
-    // Profile Fields
-    username?: string;
-    mobile?: string;
-    dob?: Date;
-    gender?: string;
-    city?: string;
-    state?: string;
-    pincode?: string;
-    fullAddress?: string;
+    role: 'admin';
 }
 
 const UserSchema: Schema = new Schema({
@@ -22,17 +13,7 @@ const UserSchema: Schema = new Schema({
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     avatar: { type: String, default: "" },
-    role: { type: String, enum: ['admin', 'customer'], default: 'customer' },
-
-    // Optional Profile Fields
-    username: { type: String },
-    mobile: { type: String },
-    dob: { type: Date },
-    gender: { type: String },
-    city: { type: String },
-    state: { type: String },
-    pincode: { type: String },
-    fullAddress: { type: String }
+    role: { type: String, default: 'admin' }
 }, { timestamps: true });
 
 export default mongoose.model<IUser>('User', UserSchema);

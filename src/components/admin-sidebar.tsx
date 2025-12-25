@@ -21,6 +21,7 @@ import { NavDocuments } from "@/components/nav-documents"
 import { NavMain } from "@/components/nav-main"
 import { NavSecondary } from "@/components/nav-secondary"
 import { NavUser } from "@/components/nav-user"
+import { useAuth } from "@/context/auth-context"
 import {
   Sidebar,
   SidebarContent,
@@ -149,6 +150,14 @@ const data = {
 }
 
 export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+  const { user } = useAuth()
+
+  const userData = user ? {
+    name: user.name || "Admin",
+    email: user.email || "m@example.com",
+    avatar: user.avatar || "/avatars/shadcn.jpg"
+  } : data.user;
+
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -172,7 +181,7 @@ export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>)
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={data.user} logoutRedirect="/login" />
+        <NavUser user={userData} logoutRedirect="/login" />
       </SidebarFooter>
     </Sidebar>
   )
