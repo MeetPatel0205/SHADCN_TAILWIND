@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react"
-import { AppSidebar } from "@/components/app-sidebar"
+import { AdminSidebar } from "@/components/admin-sidebar"
 import { ChartAreaInteractive } from "@/components/chart-area-interactive"
 import { DataTable } from "@/components/data-table"
 import { SectionCards } from "@/components/section-cards"
@@ -37,7 +37,7 @@ export default function Page() {
         } as React.CSSProperties
       }
     >
-      <AppSidebar variant="inset" />
+      <AdminSidebar variant="inset" />
       <SidebarInset>
         <SiteHeader />
         <div className="flex flex-1 flex-col">

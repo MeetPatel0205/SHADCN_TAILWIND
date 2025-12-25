@@ -1,5 +1,3 @@
-"use client"
-
 import * as React from "react"
 import {
   IconCamera,
@@ -150,20 +148,7 @@ const data = {
   ],
 }
 
-import { useAuth } from "@/context/auth-context"
-
-// ... imports ...
-
-export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
-  const { user, isAuthenticated } = useAuth()
-
-  // Use real user data if authenticated, otherwise fallback or empty
-  const userData = isAuthenticated && user ? {
-    name: user.name,
-    email: user.email,
-    avatar: user.avatar || "/avatars/shadcn.jpg"
-  } : data.user
-
+export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="offcanvas" {...props}>
       <SidebarHeader>
@@ -187,7 +172,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavSecondary items={data.navSecondary} className="mt-auto" />
       </SidebarContent>
       <SidebarFooter>
-        <NavUser user={userData} />
+        <NavUser user={data.user} logoutRedirect="/login" />
       </SidebarFooter>
     </Sidebar>
   )

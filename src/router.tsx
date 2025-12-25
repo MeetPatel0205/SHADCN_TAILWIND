@@ -1,10 +1,10 @@
-// import path from "path";
 import { createBrowserRouter } from "react-router-dom";
-import { LoginForm } from "./components/login-form";
-// import { Pages } from "./Pages/HomePage";
 import Page from "./Pages/HomePage";
-// import { SignupForm } from "./Pages/Signup_Registerpage";
-import { SignupForm } from "./components/signup-form";
+import { CustomerSignupPage } from "./Pages/CustomerSignupPage";
+import { CustomerDashboard } from "./Pages/CustomerDashboard";
+import CustomerLoginPage from "./Pages/CustomerLoginPage";
+import LoginPage from "./Pages/LoginPage";
+import SignupPage from "./Pages/SignupPage";
 
 const routers = createBrowserRouter([
     {
@@ -14,11 +14,23 @@ const routers = createBrowserRouter([
     },
     {
         path: "/login",
-        element: <LoginForm />,
+        element: <LoginPage />,
     },
     {
         path: "/signup",
-        element: <SignupForm />,
+        element: <SignupPage />,
+    },
+    {
+        path: "/customer/signup",
+        element: <CustomerSignupPage />,
+    },
+    {
+        path: "/customer/login",
+        element: <CustomerLoginPage />,
+    },
+    {
+        path: "/customer/dashboard",
+        element: <CustomerDashboard />,
     },
 ]);
 

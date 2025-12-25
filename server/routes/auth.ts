@@ -27,7 +27,12 @@ const verifyToken = (req: AuthRequest, res: Response, next: NextFunction) => {
 
 // REGISTER
 router.post('/signup', async (req: Request, res: Response) => {
-    const { name, email, password } = req.body;
+    const {
+        name, email, password,
+        username, mobile, dob, gender,
+        city, state, pincode, fullAddress,
+        role
+    } = req.body;
 
     try {
         const existingUser = await User.findOne({ email });
@@ -40,20 +45,31 @@ router.post('/signup', async (req: Request, res: Response) => {
             name,
             email,
             password: hashedPassword,
-            avatar: '/avatars/shadcn.jpg' // Default avatar for now
+            avatar: '/avatars/shadcn.jpg', // Default avatar
+            role: role || 'customer',
+            username,
+            mobile,
+            dob,
+            gender,
+            city,
+            state,
+            pincode,
+            fullAddress
         });
 
         const savedUser = await newUser.save();
 
-        // Create token
-        const token = jwt.sign({ _id: savedUser._id }, JWT_SECRET);
+        // Create token with role
+        const token = jwt.sign({ _id: savedUser._id, role: savedUser.role }, JWT_SECRET);
 
         res.status(201).json({
             token,
             user: {
+                id: savedUser._id,
                 name: savedUser.name,
                 email: savedUser.email,
-                avatar: savedUser.avatar
+                avatar: savedUser.avatar,
+                role: savedUser.role
             }
         });
     } catch (err: any) {
