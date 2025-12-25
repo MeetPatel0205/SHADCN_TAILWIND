@@ -149,11 +149,11 @@ const data = {
   ],
 }
 
-export function AdminSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
+export function UserSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { user } = useAuth()
 
   const userData = user ? {
-    name: user.name || "Admin",
+    name: user.name || "User",
     email: user.email || "m@example.com",
     avatar: user.avatar || "/avatars/shadcn.jpg"
   } : data.user;

@@ -27,16 +27,16 @@ const verifyToken = (req: AuthRequest, res: Response, next: NextFunction) => {
 };
 
 // ==========================================
-// ADMIN ROUTES (User Collection)
+// USER ROUTES (User Collection - Formerly Admin)
 // ==========================================
 
-// ADMIN REGISTER
+// USER REGISTER
 router.post('/signup', async (req: Request, res: Response) => {
     const { name, email, password } = req.body;
 
     try {
         const existingUser = await User.findOne({ email });
-        if (existingUser) return res.status(400).json({ message: 'Admin email already exists' });
+        if (existingUser) return res.status(400).json({ message: 'User email already exists' });
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
@@ -46,12 +46,12 @@ router.post('/signup', async (req: Request, res: Response) => {
             email,
             password: hashedPassword,
             avatar: '/avatars/shadcn.jpg',
-            role: 'admin'
+            role: 'user'
         });
 
         const savedUser = await newUser.save();
 
-        const token = jwt.sign({ _id: savedUser._id, role: 'admin' }, JWT_SECRET);
+        const token = jwt.sign({ _id: savedUser._id, role: 'user' }, JWT_SECRET);
 
         res.status(201).json({
             token,
@@ -60,7 +60,7 @@ router.post('/signup', async (req: Request, res: Response) => {
                 name: savedUser.name,
                 email: savedUser.email,
                 avatar: savedUser.avatar,
-                role: 'admin'
+                role: 'user'
             }
         });
     } catch (err: any) {
@@ -68,18 +68,18 @@ router.post('/signup', async (req: Request, res: Response) => {
     }
 });
 
-// ADMIN LOGIN
+// USER LOGIN
 router.post('/login', async (req: Request, res: Response) => {
     const { email, password } = req.body;
 
     try {
         const user = await User.findOne({ email });
-        if (!user) return res.status(400).json({ message: 'Admin email not found' });
+        if (!user) return res.status(400).json({ message: 'User email not found' });
 
         const validPass = await bcrypt.compare(password, user.password);
         if (!validPass) return res.status(400).json({ message: 'Invalid password' });
 
-        const token = jwt.sign({ _id: user._id, role: 'admin' }, JWT_SECRET);
+        const token = jwt.sign({ _id: user._id, role: 'user' }, JWT_SECRET);
 
         res.json({
             token,
@@ -88,7 +88,7 @@ router.post('/login', async (req: Request, res: Response) => {
                 name: user.name,
                 email: user.email,
                 avatar: user.avatar,
-                role: 'admin'
+                role: 'user'
             }
         });
     } catch (err: any) {
@@ -195,7 +195,7 @@ router.get('/me', verifyToken, async (req: AuthRequest, res: Response) => {
         const { _id, role } = req.user;
         let userData: any;
 
-        if (role === 'admin') {
+        if (role === 'user' || role === 'admin') { // Support legacy admin or new user role
             userData = await User.findById(_id).select('-password');
         } else if (role === 'customer') {
             userData = await Customer.findById(_id).select('-password');
