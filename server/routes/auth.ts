@@ -32,11 +32,14 @@ const verifyToken = (req: AuthRequest, res: Response, next: NextFunction) => {
 
 // USER REGISTER
 router.post('/signup', async (req: Request, res: Response) => {
-    const { name, email, password } = req.body;
+    const { name, email, mobile, password } = req.body;
 
     try {
         const existingUser = await User.findOne({ email });
         if (existingUser) return res.status(400).json({ message: 'User email already exists' });
+
+        const existingMobile = await User.findOne({ mobile });
+        if (existingMobile) return res.status(400).json({ message: 'User mobile already exists' });
 
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
@@ -44,6 +47,7 @@ router.post('/signup', async (req: Request, res: Response) => {
         const newUser = new User({
             name,
             email,
+            mobile,
             password: hashedPassword,
             avatar: '/avatars/shadcn.jpg',
             role: 'user'
@@ -59,6 +63,7 @@ router.post('/signup', async (req: Request, res: Response) => {
                 id: savedUser._id,
                 name: savedUser.name,
                 email: savedUser.email,
+                mobile: savedUser.mobile,
                 avatar: savedUser.avatar,
                 role: 'user'
             }

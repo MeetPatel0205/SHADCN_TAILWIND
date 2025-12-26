@@ -29,6 +29,7 @@ export function SignupForm({
 
     const formData = new FormData(event.currentTarget)
     const email = formData.get("email") as string
+    const mobile = formData.get("mobile") as string
     const password = formData.get("password") as string
     const confirmPassword = formData.get("confirm-password") as string
     // Assuming we want to capture a name as well, defaulting to email prefix for now if not in form
@@ -44,7 +45,7 @@ export function SignupForm({
       const response = await fetch("/api/auth/signup", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, password, role: "user" }),
+        body: JSON.stringify({ name, email, mobile, password, role: "user" }),
       })
 
       const data = await response.json()
@@ -86,6 +87,14 @@ export function SignupForm({
                   name="email"
                   type="email"
                   placeholder="m@example.com"
+                  required
+                />
+                <FieldLabel htmlFor="mobile">Mobile</FieldLabel>
+                <Input
+                  id="mobile"
+                  name="mobile"
+                  type="number"
+                  placeholder="1234567890"
                   required
                 />
                 <FieldDescription>
