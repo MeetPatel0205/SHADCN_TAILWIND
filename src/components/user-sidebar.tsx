@@ -64,6 +64,21 @@ const data = {
       url: "#",
       icon: IconUsers,
     },
+    {
+      title: "Customer",
+      url: "#",
+      icon: IconUsers, // You might want a different icon here, e.g., IconUserPlus or similar if available, keeping IconUsers for now
+      items: [
+        {
+          title: "All Customers",
+          url: "/customers",
+        },
+        {
+          title: "Add Customer",
+          url: "/create-customer",
+        },
+      ],
+    },
   ],
   navClouds: [
     {

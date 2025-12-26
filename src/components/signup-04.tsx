@@ -13,26 +13,31 @@ import { Textarea } from "@/components/ui/textarea"
 import { toast } from "sonner"
 import { IconBrandGoogle, IconBrandGithub } from "@tabler/icons-react"
 
-export function Signup04({ className, ...props }: React.ComponentPropsWithoutRef<"div">) {
+interface Signup04Props extends React.ComponentPropsWithoutRef<"div"> {
+    isInternal?: boolean;
+    initialData?: any;
+}
+
+export function Signup04({ className, isInternal = false, initialData, ...props }: Signup04Props) {
     const navigate = useNavigate()
-    const { login } = useAuth()
+    const { login, token } = useAuth()
     const [isLoading, setIsLoading] = useState(false)
 
     // Form State
     const [formData, setFormData] = useState({
-        name: "",
-        username: "",
-        email: "",
+        name: initialData?.name || "",
+        username: initialData?.username || "",
+        email: initialData?.email || "",
         password: "",
         confirmPassword: "",
-        mobile: "",
-        dob: "",
-        gender: "",
-        city: "",
-        state: "",
-        pincode: "",
-        fullAddress: "",
-        avatar: "" // Optional placeholder
+        mobile: initialData?.mobile || "",
+        dob: initialData?.dob ? new Date(initialData.dob).toISOString().split('T')[0] : "",
+        gender: initialData?.gender || "",
+        city: initialData?.city || "",
+        state: initialData?.state || "",
+        pincode: initialData?.pincode || "",
+        fullAddress: initialData?.fullAddress || "",
+        avatar: initialData?.avatar || ""
     })
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -54,24 +59,60 @@ export function Signup04({ className, ...props }: React.ComponentPropsWithoutRef
         }
 
         try {
-            const response = await fetch("/api/auth/customer/signup", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                    ...formData,
-                    role: "customer"
-                }),
-            })
+            const url = initialData
+                ? `/api/customers/${initialData._id}`
+                : (isInternal ? "/api/customers" : "/api/auth/customer/signup");
 
-            const data = await response.json()
+            const method = initialData ? "PUT" : "POST";
 
-            if (!response.ok) {
-                throw new Error(data.message || "Something went wrong")
+            if (isInternal) {
+                const authToken = token || localStorage.getItem('token');
+                if (!authToken) {
+                    toast.error("You must be logged in to create a customer");
+                    setIsLoading(false);
+                    return;
+                }
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${authToken}`
+                    },
+                    body: JSON.stringify({
+                        ...formData,
+                        role: "customer"
+                    }),
+                })
+
+                const data = await response.json()
+
+                if (!response.ok) {
+                    throw new Error(data.message || "Something went wrong")
+                }
+
+                toast.success("Customer created successfully")
+                navigate("/customers")
+            } else {
+                const response = await fetch(url, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({
+                        ...formData,
+                        role: "customer"
+                    }),
+                })
+
+                const data = await response.json()
+
+                if (!response.ok) {
+                    throw new Error(data.message || "Something went wrong")
+                }
+
+                login(data.token, data.user)
+                toast.success("Customer account created successfully")
+                navigate("/customer/dashboard")
             }
-
-            login(data.token, data.user)
-            toast.success("Customer account created successfully")
-            navigate("/customer/dashboard")
         } catch (error: any) {
             toast.error(error.message)
         } finally {
@@ -86,9 +127,11 @@ export function Signup04({ className, ...props }: React.ComponentPropsWithoutRef
                     <form onSubmit={onSubmit} className="p-6 md:p-8">
                         <div className="flex flex-col gap-6">
                             <div className="flex flex-col items-center text-center">
-                                <h1 className="text-2xl font-bold">Create your account</h1>
+                                <h1 className="text-2xl font-bold">
+                                    {initialData ? "Edit Customer" : (isInternal ? "Add New Customer" : "Create your account")}
+                                </h1>
                                 <p className="text-balance text-muted-foreground">
-                                    Sign up for the Customer Portal
+                                    {initialData ? "Update customer details" : (isInternal ? "Create a new customer profile" : "Sign up for the Customer Portal")}
                                 </p>
                             </div>
 
@@ -173,29 +216,33 @@ export function Signup04({ className, ...props }: React.ComponentPropsWithoutRef
                             </div>
 
                             <Button type="submit" className="w-full" disabled={isLoading}>
-                                {isLoading ? "Creating Account..." : "Sign Up"}
+                                {isLoading ? (initialData ? "Updating..." : "Creating...") : (initialData ? "Update Customer" : (isInternal ? "Create Customer" : "Sign Up"))}
                             </Button>
 
-                            <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
-                                <span className="relative z-10 bg-background px-2 text-muted-foreground">
-                                    Or continue with
-                                </span>
-                            </div>
-                            <div className="grid grid-cols-2 gap-4">
-                                <Button variant="outline" className="w-full" type="button">
-                                    <IconBrandGithub className="h-4 w-4 mr-2" /> GitHub
-                                </Button>
-                                <Button variant="outline" className="w-full" type="button">
-                                    <IconBrandGoogle className="h-4 w-4 mr-2" /> Google
-                                </Button>
-                            </div>
+                            {!isInternal && (
+                                <>
+                                    <div className="relative text-center text-sm after:absolute after:inset-0 after:top-1/2 after:z-0 after:flex after:items-center after:border-t after:border-border">
+                                        <span className="relative z-10 bg-background px-2 text-muted-foreground">
+                                            Or continue with
+                                        </span>
+                                    </div>
+                                    <div className="grid grid-cols-2 gap-4">
+                                        <Button variant="outline" className="w-full" type="button">
+                                            <IconBrandGithub className="h-4 w-4 mr-2" /> GitHub
+                                        </Button>
+                                        <Button variant="outline" className="w-full" type="button">
+                                            <IconBrandGoogle className="h-4 w-4 mr-2" /> Google
+                                        </Button>
+                                    </div>
 
-                            <div className="text-center text-sm">
-                                Already have an account?{" "}
-                                <Link to="/customer/login" className="underline underline-offset-4">
-                                    Log in
-                                </Link>
-                            </div>
+                                    <div className="text-center text-sm">
+                                        Already have an account?{" "}
+                                        <Link to="/customer/login" className="underline underline-offset-4">
+                                            Log in
+                                        </Link>
+                                    </div>
+                                </>
+                            )}
                         </div>
                     </form>
                     <div className="relative hidden bg-muted md:block">

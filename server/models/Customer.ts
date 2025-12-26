@@ -15,6 +15,7 @@ export interface ICustomer extends Document {
     state: string;
     pincode: string;
     fullAddress: string;
+    createdBy?: string;
 }
 
 const CustomerSchema: Schema = new Schema({
@@ -32,7 +33,8 @@ const CustomerSchema: Schema = new Schema({
     city: { type: String, required: true },
     state: { type: String, required: true },
     pincode: { type: String, required: true },
-    fullAddress: { type: String, required: true }
+    fullAddress: { type: String, required: true },
+    createdBy: { type: Schema.Types.ObjectId, ref: 'User' } // Reference to User who created this customer
 }, { timestamps: true });
 
 export default mongoose.model<ICustomer>('Customer', CustomerSchema);

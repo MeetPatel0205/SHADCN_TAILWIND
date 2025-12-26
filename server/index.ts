@@ -4,6 +4,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import dashboardRoutes from './routes/dashboard';
 import authRoutes from './routes/auth';
+import customerRoutes from './routes/customer';
 
 dotenv.config();
 
@@ -16,6 +17,7 @@ app.use(express.json());
 // Routes
 app.use('/api/dashboard', dashboardRoutes);
 app.use('/api/auth', authRoutes);
+app.use('/api/customers', customerRoutes);
 
 // Database Connection
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/shadcn-dashboard')
